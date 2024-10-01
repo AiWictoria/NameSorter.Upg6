@@ -129,9 +129,13 @@ namespace NameSorter
                                 names.Add(name);
                             }
                         }
-                        Console.WriteLine($"Namnen har lagts till. {dataTable.Rows.Count} rader har blivit inlästa.");
+                        Console.WriteLine($"{dataTable.Rows.Count} rader har blivit inlästa. Listan innehåller nu följande namn: ");
+                        foreach (var name in names)
+                        {
+                            Console.WriteLine(name);
+                        }
                     }
-                }
+                    }
                 //Hittar inte angivna filen
                 catch (FileNotFoundException ex)
                 {
