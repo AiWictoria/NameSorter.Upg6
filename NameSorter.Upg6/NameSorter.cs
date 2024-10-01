@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
-using System.Xml.Linq;
 
 namespace NameSorter
 {
@@ -190,33 +189,32 @@ namespace NameSorter
             {
                 Console.WriteLine(name);
             }
+            Console.WriteLine(" ---- Namn sortering efter språk meny---- \n" +
+                "\n\tVälj språk för sortering:" +
+                "\n\t1. Svenska (sv-SE)" +
+                "\n\t2. Engelska (en-US)" +
+                "\n\t3. Norska (nb-NO)" +
+                "\n\t4. Finska (fi-FI)" +
+                "\n\t5. Danska (da-DK)");
 
-            Console.WriteLine("\nVälj språk för sortering:");
-            Console.WriteLine("1. Svenska (sv-SE)");
-            Console.WriteLine("2. Engelska (en-US)");
-            Console.WriteLine("3. Norska (nb-NO)");
-            Console.WriteLine("4. Finska (fi-FI)");
-            Console.WriteLine("5. Danska (da-DK)");
-
-            string choice = Console.ReadLine();
             CultureInfo culture;
 
             // Ställ in språkkultur beroende på användarens val
-            switch (choice)
+            switch (Console.ReadKey(true).Key)
             {
-                case "1":
+                case ConsoleKey.D1:
                     culture = new CultureInfo("sv-SE"); // Svenska
                     break;
-                case "2":
+                case ConsoleKey.D2:
                     culture = new CultureInfo("en-US"); // Engelska
                     break;
-                case "3":
+                case ConsoleKey.D3:
                     culture = new CultureInfo("nb-NO"); // Norska
                     break;
-                case "4":
+                case ConsoleKey.D4:
                     culture = new CultureInfo("fi-FI"); // Finska
                     break;
-                case "5":
+                case ConsoleKey.D5:
                     culture = new CultureInfo("da-DK"); // Danska
                     break;
                 default:
@@ -235,6 +233,7 @@ namespace NameSorter
                 Console.WriteLine(namn);
             }
         }
+        // Metod för specifik sökning efter ett namn
         internal void SearchNames(List<string> names)
         {
             Console.Clear();
@@ -245,20 +244,18 @@ namespace NameSorter
             // Kontrollera att input inte är tomt
             if (string.IsNullOrWhiteSpace(searchName))
             {
-                Console.WriteLine("Input cannot be empty. Please enter a valid name.");
+                Console.WriteLine("Ogiltligt namn, vänligen ange ett nytt namn.");
             }
             else
             {
-                // Använd binärsökning för att söka efter namnet, ignorerar stora/små bokstäver
-                int index = names.BinarySearch(searchName, StringComparer.OrdinalIgnoreCase);
-
-                if (index >= 0)
+                // Metod för att söka efter namn
+                if (names.Contains(searchName, StringComparer.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine($"{searchName} is in the list.");
+                    Console.WriteLine($"{searchName} finns i listan.");
                 }
                 else
                 {
-                    Console.WriteLine($"{searchName} is not in the list.");
+                    Console.WriteLine($"{searchName} finns inte i listan.");
                 }
             }
         }
