@@ -224,9 +224,21 @@ namespace NameSorter
                     {
                         Console.WriteLine("Ogiltlig val, vänligen väl ett av valen i menyn");
                     }
-
                 }
-
+            }
+            //Metod för att ändra till stor första bokstav
+            public string CapitalizeFirstLetter(string input)
+            {
+                try
+                {
+                    // Ändra första bokstaven till stor bokstav och resten till små bokstäver
+                    return char.ToUpper(input[0]) + input.Substring(1).ToLower();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return input;
+                }
             }
         }
 
