@@ -1,52 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Data;
 using System.Data.OleDb;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Xml.Linq;
 
-namespace NameSorter.Upg6
+namespace NameSorter
 {
     public class NameSorter(List<string> names)
     {
+        //Deklarerar lista för namn
 
         //Metod för att lägga till namn
-        public void AddNewNames()
+        public void AddNewNames(List<string> names)
         {
-            while (true)
+            Console.Clear();
+            Console.WriteLine("Välj ett av följande: " +
+                "\n\t1. Lägga in namn manuellt" +
+                "\n\t2. Ladda upp excelfil med namn" +
+                "\n\tEsc. Återgå till menyn");
+
+            switch (Console.ReadKey(true).Key)
             {
-                Console.WriteLine("Välj ett av följande: " +
-                    "\n\t1. Lägga in namn manuellt" +
-                    "\n\t2. Ladda upp excelfil med namn" +
-                    "\n\tEsc. Återgå till menyn");
+                //Anropar metoden för att lägga in namn manuellt
+                case ConsoleKey.D1:
+                    AddNamesManually(names);
+                    break;
 
-                switch (Console.ReadKey(true).Key)
-                {
-                    //Anropar metoden för att lägga in namn manuellt
-                    case ConsoleKey.D1:
-                        AddNamesManually(names);
-                        break;
+                //Anropar metoden för att lägga in namn via Excellista
+                case ConsoleKey.D2:
+                    AddNamesExcel(names);
+                    break;
 
-                    //Anropar metoden för att lägga in namn via Excellista
-                    case ConsoleKey.D2:
-                        AddNamesExcel(names);
-                        break;
-
-                    //Återgå till meny
-                    case ConsoleKey.Escape:
-                        returnBackToMenu();
-                        break;
-                    default:
-                        Console.WriteLine("Ogiltligt val, vänligen ange ett av val i menyn");
-                        continue;
-                }
-
+                //Återgå till meny
+                case ConsoleKey.Escape:
+                    break;
+                default:
+                    Console.WriteLine("Ogiltligt val, vänligen ange ett av val i menyn");
+                    break;
             }
+
         }
         //Metod för att lägga in namn med excel lista
         public void AddNamesExcel(List<string> names)
         {
+            Console.Clear();
             //Låter användaren lägga in excel fil + felhantering
             try
             {
@@ -60,7 +56,6 @@ namespace NameSorter.Upg6
                 if (string.IsNullOrWhiteSpace(filePath))
                 {
                     Console.WriteLine("Ogiltig filväg. Filvägen behöver se ut enligt följande: \nExempel: C:\\Users\\Name\\Dokuments\\Filename\n");
-                    returnBackToMenu();
                 }
 
                 string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\"";
@@ -76,7 +71,6 @@ namespace NameSorter.Upg6
                     if (string.IsNullOrWhiteSpace(sheetName))
                     {
                         Console.WriteLine("Ogiltigt bladnamn, namn kan inte vara tomt eller enadst mellanslag");
-                        returnBackToMenu();
                     }
                     //Använder SQL-fråga för att läsa data från excelfilen
                     OleDbCommand command = new OleDbCommand($"SELECT * FROM [{sheetName}$]", connection);
@@ -94,45 +88,36 @@ namespace NameSorter.Upg6
                         // Adderar namn om data finns i den raden
                         if (!string.IsNullOrEmpty(name))
                         {
-                            ToCapitalFirstLetter(name);
+                            name = ToCapitalFirstLetter(name);
                             names.Add(name);
                         }
                     }
-                    Console.WriteLine($"{dataTable.Rows.Count} rader har blivit inlästa. Listan innehåller nu följande namn: ");
+                    Console.WriteLine($"\n{dataTable.Rows.Count} rader har blivit inlästa. Listan innehåller nu följande namn: ");
                     foreach (var name in names)
                     {
                         Console.WriteLine(name);
                     }
                 }
             }
-            //Hittar inte angivna filen
+            //Felhantering
             catch (FileNotFoundException ex)
             {
                 Console.WriteLine($"Excel-filen hittades inte: {ex.Message}");
-                returnBackToMenu();
             }
             catch (OleDbException ex)
             {
                 Console.WriteLine($"Fel vid anslutning till Excel-filen: {ex.Message}");
-                returnBackToMenu();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Fel vid inläsning av Excel-filen: {ex.Message}");
-                returnBackToMenu();
             }
-        }
-        //Metod för att återgå till menyn Behöver flyttas till Meny classen 
-        public void returnBackToMenu()
-        {
-            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn");
-            Console.ReadKey();
-            //--------------Metod för menyn------------------------
         }
 
         //Metod för att lägga till namn manuellt
-        private void AddNamesManually(List<string> names)
+        public void AddNamesManually(List<string> names)
         {
+            Console.Clear();
             Console.Write("Ange hur många namn du vill lägga till: ");
             try //Felhanteringen
             {
@@ -142,10 +127,11 @@ namespace NameSorter.Upg6
                 {
                     Console.Write("Ange namn du vill lägga till: ");
                     string namn = Console.ReadLine();
-                    ToCapitalFirstLetter(namn);
+
                     //Om det angivna namnet inte finns lägger till i listan
                     if (!names.Contains(namn))
                     {
+                        namn = ToCapitalFirstLetter(namn);
                         names.Add(namn);
                         Console.WriteLine($"Namn {namn} har lagts till.\n");
                     }
@@ -160,48 +146,25 @@ namespace NameSorter.Upg6
             catch (Exception ex)
             {
                 Console.WriteLine($"Fel inmatning: {ex.Message}");
-                returnBackToMenu();
             }
         }
         //Metod för att ta bort namn
         public void RemoveNames(List<string> names)
         {
-            while (true)
+            Console.Clear();
+            Console.Write("Ange namnet som ska tas bort: ");
+            string removeName = Console.ReadLine();
+            removeName = ToCapitalFirstLetter(removeName);
+            //Om namnet finns, tas den bort
+            if (names.Contains(removeName))
             {
-                Console.WriteLine("Välj ett av följande: " +
-                                  "\n\t1. Ta bort namn" +
-                                  "\n\tEsc. Återgå till menyn");
-                //Begränsar med endast key input för menyval
-                var key = Console.ReadKey(true).Key;
-
-                if (key == ConsoleKey.D1)
-                {
-                    Console.Write("Ange namnet som ska tas bort: ");
-                    string removeName = Console.ReadLine();
-                    ToCapitalFirstLetter(removeName);
-                    //Om namnet finns, tas den bort
-                    if (names.Contains(removeName))
-                    {
-                        names.Remove(removeName);
-                        Console.WriteLine($"Namnet {removeName} har tagits bort.");
-                    }
-                    //Om namn inte finns skriver programmet ut det och användaren skickas tillbaka till menyn
-                    else
-                    {
-                        Console.WriteLine($"Namnet {removeName} finns inte i listan.");
-                        returnBackToMenu();
-                    }
-                }
-                //Återgår till menyn
-                else if (key == ConsoleKey.Escape)
-                {
-                    returnBackToMenu();
-                }
-                //Felhantering
-                else
-                {
-                    Console.WriteLine("Ogiltlig val, vänligen väl ett av valen i menyn");
-                }
+                names.Remove(removeName);
+                Console.WriteLine($"Namnet {removeName} har tagits bort.");
+            }
+            //Om namn inte finns skriver programmet ut det och användaren skickas tillbaka till menyn
+            else
+            {
+                Console.WriteLine($"Namnet {removeName} finns inte i listan.");
             }
         }
         //Metod för att ändra till stor första bokstav
@@ -215,7 +178,88 @@ namespace NameSorter.Upg6
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return input;
+                return input; // Returnera input som den är om ett fel uppstår
+            }
+        }
+        public void SortNames(List<string> names)
+        {
+            Console.Clear();
+            // Skriv ut den ursprungliga listan
+            Console.WriteLine("Original lista:");
+            foreach (var name in names)
+            {
+                Console.WriteLine(name);
+            }
+
+            Console.WriteLine("\nVälj språk för sortering:");
+            Console.WriteLine("1. Svenska (sv-SE)");
+            Console.WriteLine("2. Engelska (en-US)");
+            Console.WriteLine("3. Norska (nb-NO)");
+            Console.WriteLine("4. Finska (fi-FI)");
+            Console.WriteLine("5. Danska (da-DK)");
+
+            string choice = Console.ReadLine();
+            CultureInfo culture;
+
+            // Ställ in språkkultur beroende på användarens val
+            switch (choice)
+            {
+                case "1":
+                    culture = new CultureInfo("sv-SE"); // Svenska
+                    break;
+                case "2":
+                    culture = new CultureInfo("en-US"); // Engelska
+                    break;
+                case "3":
+                    culture = new CultureInfo("nb-NO"); // Norska
+                    break;
+                case "4":
+                    culture = new CultureInfo("fi-FI"); // Finska
+                    break;
+                case "5":
+                    culture = new CultureInfo("da-DK"); // Danska
+                    break;
+                default:
+                    Console.WriteLine("Ogiltigt val, använder standardspråket (svenska).");
+                    culture = new CultureInfo("sv-SE");
+                    break;
+            }
+
+            // Sortera namnlistan med det valda språket användaren har valt.
+            names.Sort(StringComparer.Create(culture, true));
+
+            // Visa den sorterade listan
+            Console.WriteLine("\nSorterad namnlista:");
+            foreach (var namn in names)
+            {
+                Console.WriteLine(namn);
+            }
+        }
+        internal void SearchNames(List<string> names)
+        {
+            Console.Clear();
+            // Begär användarens input för sökning
+            Console.Write("\nAnge namn att söka: ");
+            string searchName = Console.ReadLine();
+            searchName = ToCapitalFirstLetter(searchName);
+            // Kontrollera att input inte är tomt
+            if (string.IsNullOrWhiteSpace(searchName))
+            {
+                Console.WriteLine("Input cannot be empty. Please enter a valid name.");
+            }
+            else
+            {
+                // Använd binärsökning för att söka efter namnet, ignorerar stora/små bokstäver
+                int index = names.BinarySearch(searchName, StringComparer.OrdinalIgnoreCase);
+
+                if (index >= 0)
+                {
+                    Console.WriteLine($"{searchName} is in the list.");
+                }
+                else
+                {
+                    Console.WriteLine($"{searchName} is not in the list.");
+                }
             }
         }
     }

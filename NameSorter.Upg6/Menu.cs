@@ -4,18 +4,21 @@ using System.Globalization;
 
 namespace NameSorter
 {
-    public class Meny
+    public class Menu
     {
-        public Meny()
+        List<string> names = new List<string>(); 
+            
+        public Menu()
         {
         }
-        public void MainMeny()
+        public void MainMenu()
         {
-            var meny = new Meny();
+            var sorter = new NameSorter(names);
+
             while (true)
             {
                 Console.Clear(); //Rensar konsolen för att få den mer läsbar
-                Console.WriteLine(" ---- Namn Sortering ---- \n" +
+                Console.WriteLine(" ---- Namn Sortering Meny---- \n" +
                 "\n\tVälj en av följande operationer för vad du önskar att göra:" +
                 "\n\t1. Lägg till namn" +
                 "\n\t2. Sortera (språk)" +
@@ -29,22 +32,22 @@ namespace NameSorter
 
                     //Anropar metod för att addera namn. (vik)
                     case ConsoleKey.D1:
-
+                        sorter.AddNewNames(names);
                         break;
 
                     //Anropar metod för att sortera namn efter önskat språk (joh)
                     case ConsoleKey.D2:
-
+                        sorter.SortNames(names);
                         break;
 
                     //Anropar metod för att ta bort namn. (vik)
                     case ConsoleKey.D3:
-
+                        sorter.RemoveNames(names);
                         break;
 
                     //Anropar metod för att söka på namn. (joh)
                     case ConsoleKey.D4:
-
+                        sorter.SearchNames(names);
                         break;
 
                     //Avslutar whileloopen och programmet
@@ -62,6 +65,8 @@ namespace NameSorter
                 Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
                 Console.ReadKey();
             }
+           
         }
+       
     }
 }
