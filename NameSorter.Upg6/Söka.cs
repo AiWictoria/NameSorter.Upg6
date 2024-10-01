@@ -7,7 +7,7 @@
             NamnLista namnLista = new NamnLista();
 
             // Begär användarens input för sökning
-            Console.WriteLine("\nEnter name to search:");
+            Console.WriteLine("\nEnter name to search");
             string searchName = Console.ReadLine();
 
             // Kontrollera att input inte är tomt
