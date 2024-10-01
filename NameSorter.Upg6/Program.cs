@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.OleDb;
+using System.Xml.Linq;
 
 namespace NameSorter
 {
@@ -120,9 +121,11 @@ namespace NameSorter
                         foreach (DataRow row in dataTable.Rows)
                         {
                             string name = row[0].ToString();
+                            
                             // Adderar namn om data finns i den raden
                             if (!string.IsNullOrEmpty(name))
                             {
+                                ToCapitalFirstLetter(name); 
                                 names.Add(name);
                             }
                         }
@@ -166,6 +169,7 @@ namespace NameSorter
                     {
                         Console.Write("Ange namn du vill lägga till: ");
                         string namn = Console.ReadLine();
+                        ToCapitalFirstLetter(namn);
                         //Om det angivna namnet inte finns lägger till i listan
                         if (!names.Contains(namn))
                         {
@@ -201,6 +205,7 @@ namespace NameSorter
                     {
                         Console.Write("Ange namnet som ska tas bort: ");
                         string removeName = Console.ReadLine();
+                        ToCapitalFirstLetter(removeName);
                         //Om namnet finns, tas den bort
                         if (names.Contains(removeName))
                         {
@@ -227,7 +232,7 @@ namespace NameSorter
                 }
             }
             //Metod för att ändra till stor första bokstav
-            public string CapitalizeFirstLetter(string input)
+            public string ToCapitalFirstLetter(string input)
             {
                 try
                 {
