@@ -180,6 +180,7 @@ namespace NameSorter
                 return input; // Returnera input som den är om ett fel uppstår
             }
         }
+        // Metod för att sortera namnen
         public void SortNames(List<string> names)
         {
             Console.Clear();
