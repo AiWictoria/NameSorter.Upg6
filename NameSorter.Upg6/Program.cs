@@ -8,6 +8,7 @@ namespace NameSorter
         static void Main(string[] args)
         {
 
+            List<string> names = new List<string>();
             //Console.WriteLine("Original list:");
             //foreach (var name in names)
             //{
@@ -37,10 +38,9 @@ namespace NameSorter
 
 
         }
-        public class NameSorter
+        public class NameSorter (List<string> names)
         {
-          
-            List<string> names = new List<string>();
+
             //Metod för att lägga till namn
             public void AddNewNames()
             {
@@ -53,11 +53,12 @@ namespace NameSorter
 
                     switch (Console.ReadKey(true).Key)
                     {
+                        //Anropar metoden för att lägga in namn manuellt
                         case ConsoleKey.D1:
-                            //AddNamesManually();
+                            AddNamesManually(names);
                             break;
 
-                        //Lägga till namn via Excellista
+                        //Anropar metoden för att lägga in namn via Excellista
                         case ConsoleKey.D2:
                             AddNamesExcel(names);
                             break;
@@ -73,7 +74,6 @@ namespace NameSorter
             //Metod för att lägga in namn med excel lista
             public void AddNamesExcel(List<string> names)
             {
-                NameSorter namesSorter = new NameSorter();
                 //Låter användaren lägga in excel fil + felhantering
                 try
                 {
@@ -83,15 +83,15 @@ namespace NameSorter
 
                     string filePath = Console.ReadLine();
 
-                    // Kontrollerar mellanslag och tom inmatning
+                    //Kontrollerar mellanslag och tom inmatning
                     if (string.IsNullOrWhiteSpace(filePath))
                     {
                         Console.WriteLine("Ogiltig filväg. Filvägen behöver se ut enligt följande: \nExempel: C:\\Users\\Name\\Dokuments\\Filename\n");
-                        namesSorter.returnBackToMenu();
+                        returnBackToMenu();
                     }
 
                     string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\"";
-                    // Om filväg existerar går programmet vidare till att ansluta till excelfilen och efterfrågar blad
+                    //Om filväg existerar går programmet vidare till att ansluta till excelfilen och efterfrågar blad
                     using (OleDbConnection connection = new OleDbConnection(connectionString))
                     {
                         connection.Open();
@@ -99,21 +99,21 @@ namespace NameSorter
                         Console.Write("\nVänligen ange bladnamn där namn ska hämtas ifrån: ");
                         string sheetName = Console.ReadLine();
 
-                        // Kontrollerar mellanslag och tom inmatning
+                        //Kontrollerar mellanslag och tom inmatning
                         if (string.IsNullOrWhiteSpace(sheetName))
                         {
                             Console.WriteLine("Ogiltigt bladnamn, namn kan inte vara tomt eller enadst mellanslag");
-                            namesSorter.returnBackToMenu();
+                            returnBackToMenu();
                         }
-                        // Använder SQL-fråga för att läsa data från excelfilen
+                        //Använder SQL-fråga för att läsa data från excelfilen
                         OleDbCommand command = new OleDbCommand($"SELECT * FROM [{sheetName}$]", connection);
                         OleDbDataAdapter adapter = new OleDbDataAdapter(command);
 
-                        // Använder databalbe för att hämta data från filen
+                        //Använder databalbe för att hämta data från filen
                         DataTable dataTable = new DataTable();
                         adapter.Fill(dataTable);
 
-                        // Lägg till namn från första kolumnen i names-listan
+                        //Lägg till namn från första kolumnen i names-listan
                         foreach (DataRow row in dataTable.Rows)
                         {
                             string name = row[0].ToString();
@@ -126,24 +126,24 @@ namespace NameSorter
                         Console.WriteLine($"Namnen har lagts till. {dataTable.Rows.Count} rader har blivit inlästa.");
                     }
                 }
-                // Hittar inte angivna filen
+                //Hittar inte angivna filen
                 catch (FileNotFoundException ex)
                 {
                     Console.WriteLine($"Excel-filen hittades inte: {ex.Message}");
-                    namesSorter.returnBackToMenu();
+                    returnBackToMenu();
                 }
                 catch (OleDbException ex)
                 {
                     Console.WriteLine($"Fel vid anslutning till Excel-filen: {ex.Message}");
-                    namesSorter.returnBackToMenu();
+                    returnBackToMenu();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Fel vid inläsning av Excel-filen: {ex.Message}");
-                    namesSorter.returnBackToMenu();
+                    returnBackToMenu();
                 }
             }
-            // Metod för att återgå till menyn
+            //Metod för att återgå till menyn Behöver flyttas till Meny classen 
             public void returnBackToMenu()
             {
                 Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn");
@@ -151,12 +151,41 @@ namespace NameSorter
                 //--------------Metod för menyn------------------------
             }
 
+            //Metod för att lägga till namn manuellt
+            private void AddNamesManually(List<string> names)
+            {
+                Console.Write("Ange hur många namn du vill lägga till: ");
+                try //Felhanteringen
+                {
+                    int antal = int.Parse(Console.ReadLine());
+
+                    for (int i = 1; i <= antal; i++)
+                    {
+                        Console.Write("Ange namn du vill lägga till: ");
+                        string namn = Console.ReadLine();
+                        //Om det angivna namnet inte finns lägger till i listan
+                        if (!names.Contains(namn))
+                        {
+                            names.Add(namn);
+                            Console.WriteLine($"Namn {namn} har lagts till.\n");
+                        }
+                        //Om namn finns skriver det ut det till användaren och går vidare i loopen
+                        else
+                        {
+                            Console.WriteLine($"Namn {namn} finns redan registrerat.");
+                            continue;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fel inmatning: {ex.Message}");
+                    returnBackToMenu();
+                }
+            }
         }
 
-        private void AddNamesManually()
-        {
-            throw new NotImplementedException();
-        }
+
 
         //Metod för att ta bort namn
         public void RemoveName()
