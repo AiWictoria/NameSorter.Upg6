@@ -38,7 +38,7 @@ namespace NameSorter
 
 
         }
-        public class NameSorter (List<string> names)
+        public class NameSorter(List<string> names)
         {
 
             //Metod för att lägga till namn
@@ -67,6 +67,9 @@ namespace NameSorter
                         case ConsoleKey.Escape:
                             returnBackToMenu();
                             break;
+                        default:
+                            Console.WriteLine("Ogiltligt val, vänligen ange ett av val i menyn");
+                            continue;
                     }
 
                 }
@@ -183,29 +186,54 @@ namespace NameSorter
                     returnBackToMenu();
                 }
             }
-        }
-
-
-
-        //Metod för att ta bort namn
-        public void RemoveName()
-        {
-            while (true)
+            //Metod för att ta bort namn
+            public void RemoveNames(List<string> names)
             {
-                switch (Console.ReadKey(true).Key)
+                while (true)
                 {
-                    //Ta bort namn
-                    case ConsoleKey.D1:
+                    Console.WriteLine("Välj ett av följande: " +
+                                      "\n\t1. Ta bort namn" +
+                                      "\n\tEsc. Återgå till menyn");
+                    //Begränsar med endast key input för menyval
+                    var key = Console.ReadKey(true).Key;
 
-                        break;
+                    if (key == ConsoleKey.D1)
+                    {
+                        Console.Write("Ange namnet som ska tas bort: ");
+                        string removeName = Console.ReadLine();
+                        //Om namnet finns, tas den bort
+                        if (names.Contains(removeName))
+                        {
+                            names.Remove(removeName);
+                            Console.WriteLine($"Namnet {removeName} har tagits bort.");
+                        }
+                        //Om namn inte finns skriver programmet ut det och användaren skickas tillbaka till menyn
+                        else
+                        {
+                            Console.WriteLine($"Namnet {removeName} finns inte i listan.");
+                            returnBackToMenu();
+                        }
+                    }
+                    //Återgår till menyn
+                    else if (key == ConsoleKey.Escape)
+                    {
+                        returnBackToMenu();
+                    }
+                    //Felhantering
+                    else
+                    {
+                        Console.WriteLine("Ogiltlig val, vänligen väl ett av valen i menyn");
+                    }
 
-                    //Återgå till meny
-                    case ConsoleKey.Escape:
-                        break;
                 }
 
             }
         }
+
+
+
+
+
     }
 }
 
