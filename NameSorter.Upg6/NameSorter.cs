@@ -1,12 +1,19 @@
 ﻿using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace NameSorter
 {
-    public class NameSorter(List<string> names)
+    public class NameSorter
     {
-        //Deklarerar lista för namn
+        private List<string> Names;
+
+        // Konstruktorn tar emot listan från menyn
+        public NameSorter(List<string> names)
+        {
+            Names = names;
+        }
 
         //Metod för att lägga till namn
         public void AddNewNames(List<string> names)
@@ -132,12 +139,12 @@ namespace NameSorter
                     {
                         namn = ToCapitalFirstLetter(namn);
                         names.Add(namn);
-                        Console.WriteLine($"Namn {namn} har lagts till.\n");
+                        Console.WriteLine($"{namn} har lagts till.\n");
                     }
                     //Om namn finns skriver det ut det till användaren och går vidare i loopen
                     else
                     {
-                        Console.WriteLine($"Namn {namn} finns redan registrerat.");
+                        Console.WriteLine($"{namn} finns redan registrerat.");
                         continue;
                     }
                 }
@@ -152,18 +159,19 @@ namespace NameSorter
         {
             Console.Clear();
             Console.Write("Ange namnet som ska tas bort: ");
-            string removeName = Console.ReadLine();
-            removeName = ToCapitalFirstLetter(removeName);
-            //Om namnet finns, tas den bort
-            if (names.Contains(removeName))
+            string removeName = Console.ReadLine().Trim();
+            //Kontrollerar om angivet namn finns i listan och ignorerar versaler
+            string foundName = names.FirstOrDefault(name => name.Equals(removeName, StringComparison.OrdinalIgnoreCase));
+
+            //Tar bort namn om den finns i listan annars skriver ut information om att namn inte finns
+            if (foundName != null)
             {
-                names.Remove(removeName);
-                Console.WriteLine($"Namnet {removeName} har tagits bort.");
+                names.Remove(foundName);
+                Console.WriteLine($"{foundName} har tagits bort.");
             }
-            //Om namn inte finns skriver programmet ut det och användaren skickas tillbaka till menyn
             else
             {
-                Console.WriteLine($"Namnet {removeName} finns inte i listan.");
+                Console.WriteLine($"{removeName} finns inte i listan.");
             }
         }
         //Metod för att ändra till stor första bokstav
@@ -238,10 +246,10 @@ namespace NameSorter
         internal void SearchNames(List<string> names)
         {
             Console.Clear();
+            names.Sort();
             // Begär användarens input för sökning
-            Console.Write("\nAnge namn att söka: ");
-            string searchName = Console.ReadLine();
-            searchName = ToCapitalFirstLetter(searchName);
+            Console.Write("Ange namn att söka: ");
+            string searchName = Console.ReadLine().Trim();
             // Kontrollera att input inte är tomt
             if (string.IsNullOrWhiteSpace(searchName))
             {
@@ -250,7 +258,7 @@ namespace NameSorter
             else
             {
                 // Metod för att söka efter namn
-                if (names.Contains(searchName, StringComparer.OrdinalIgnoreCase))
+                if (names.BinarySearch(searchName, StringComparer.OrdinalIgnoreCase) >= 0)
                 {
                     Console.WriteLine($"{searchName} finns i listan.");
                 }
